@@ -1,0 +1,12 @@
+{ 
+  "type":"mail",
+  "subtype":0,
+  "data":{
+  "Header-Fields": {
+    "Return-Path": "",
+    "From" : "Chuck Norris",
+    "Date" : "31.02.2012"
+    },
+  "Body":"Hi\nblahblah"
+  }
+}
