@@ -1,14 +1,18 @@
 #!/usr/bin/python2
 from pymongo import Connection
-import logging
+import logging, sys
 log = logging.getLogger('gen_stats')
 
 class StatsForUser:
   collection = 'mail_user_stats'
 
   def connect_mongo(self):
-    self.conn = Connection(self.mongo_host)
-    self.db = self.conn[self.collection]
+    try:
+      self.conn = Connection(self.mongo_host)
+      self.db = self.conn[self.collection]
+    except:
+      log.error('Mongodb not running or unreachable ! Bailing out')
+      sys.exit(0)
 
   def __init__(self,host='localhost'):
     self.mongo_host=host

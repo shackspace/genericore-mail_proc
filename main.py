@@ -7,7 +7,7 @@ logging.basicConfig(level=logging.INFO)
 log = logging.getLogger('proc_mail')
 
 SRC_QUEUE='mail_proc'
-SRC_EXCHANGE='mail_src'
+SRC_EXCHANGE='mailsrc'
 PROC_EXCHANGE='mail_proc'
 
 parser = argparse.ArgumentParser(description='generates dummy package on given exchange against AMQP')
@@ -23,7 +23,9 @@ connection = pika.AsyncoreConnection(pika.ConnectionParameters(
 channel = connection.channel()
 
 channel.exchange_declare(exchange=SRC_EXCHANGE,
+#                             durable=False, auto_delete=True,
                              type='fanout')
+
 
 channel.queue_declare(queue=SRC_QUEUE)
 
