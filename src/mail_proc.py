@@ -1,41 +1,37 @@
 #!/usr/bin/python2
 from pymongo import Connection
-from genericore import Configurable
+from genericore import MongoConnect
 import logging, sys
-log = logging.getLogger('gen_stats')
+
+MODULE_NAME = 'mail_proc'
+
+log = logging.getLogger(MODULE_NAME)
+
 DEFAULT_CONFIG = {
-  "mail_proc" : {
-    "mongdb" : {
+  MODULE_NAME : {
+    "mongodb" : {
       "host" : "localhost"
     },
-    "collection" : "mail_user_stats"
+    "collection" : {
+      "name" : "mail_user_stats",
+      "drop_collection" : False
+    }
   }
 }
 
-class StatsForUser(Configurable):
+class mail_proc(MongoConnect): #mongoconnect derives from Configurable!
   
-  def connect_mongo(self):
-    try:
-      conf = self.config['mail_proc']
-      self.conn = Connection(**conf['mongdb'])
-      self.db = self.conn[conf['collection']]
-      self.db.users.save({})
-    except Exception as e:
-      log.error('Mongodb not running or unreachable ! Bailing out' + str(e))
-      sys.exit(0)
-
   def __init__(self,conf=None):
-    Configurable.__init__(self,DEFAULT_CONFIG)
+    MongoConnect.__init__(self,MODULE_NAME,DEFAULT_CONFIG)
     self.load_conf(conf)
 
-  def create_connection(self):
-    self.connect_mongo()
   def process_mail(self,mail):
     db = self.db
     hdr = mail['data']['Header-Fields']
     log.debug (hdr)
     entry = db.users.find_one( { 'user' : hdr['From'] } )
     log.debug (entry)
+
     if not entry: #already in db, update stats
       entry = {}
       entry['user'] = hdr['From']
@@ -49,10 +45,15 @@ class StatsForUser(Configurable):
       entry['mails'].append(mail)
       entry['mailcount'] += 1
       log.debug('updating %s' % repr(entry))
+
     db.users.save(entry)
     del entry["_id"]
     del entry["mails"]
     return entry
 
-  def close_mongo(self):
-    self.conn.close()
+  def populate_parser(self,parser): 
+    MongoConnect.populate_parser(self,parser)
+
+  def eval_parser(self,parsed): 
+    MongoConnect.eval_parser(self,parsed)
+
