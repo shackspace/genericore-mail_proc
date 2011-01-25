@@ -24,10 +24,9 @@ def cb (ch,method,header,body):
   log.debug ( "Header %r" % (header,))
   log.debug ( "Body %r" % (body,))
   try:
-    entry = s.process_mail(json.loads(body))
+    entry = s.process(json.loads(body))
     log.info ( "Message to send:\n%r" % (entry,))
     e = json.dumps(entry)
-    print e
     amqp.publish(json.dumps(entry))
     log.info ('finished dumping')
   except Exception as e:

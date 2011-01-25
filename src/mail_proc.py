@@ -9,12 +9,8 @@ log = logging.getLogger(MODULE_NAME)
 
 DEFAULT_CONFIG = {
   MODULE_NAME : {
-    "mongodb" : {
-      "host" : "localhost"
-    },
-    "collection" : {
-      "name" : "mail_user_stats",
-      "drop_collection" : False
+    "database" : {
+      "collection" : "mail_proc"
     }
   }
 }
@@ -25,7 +21,7 @@ class mail_proc(MongoConnect): #mongoconnect derives from Configurable!
     MongoConnect.__init__(self,MODULE_NAME,DEFAULT_CONFIG)
     self.load_conf(conf)
 
-  def process_mail(self,mail):
+  def process(self,mail):
     db = self.db
     hdr = mail['data']['Header-Fields']
     log.debug (hdr)
