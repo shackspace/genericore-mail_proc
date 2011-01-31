@@ -1,4 +1,4 @@
 #!/bin/bash
+BINDIR="`dirname "$0"`"/../src
 mongod &
-BINDIR=`pwd`/../src
 python2 $BINDIR/main.py "$@"
